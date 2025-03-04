@@ -56,22 +56,3 @@ class CSVService {
         return insights
     }
 }
-
-
-@MainActor
-@Observable
-final class CSVData: Sendable {
-    var headers: [String] = []
-    var rows: [[String]] = []
-    
-    var insights: Insights?
-    
-   
-}
-
-struct Insights {
-    let totalPosts: Int
-    let totalLikes: Int
-    let totalNewFollowers: Int
-    let totalUnfollows: Int
-}
