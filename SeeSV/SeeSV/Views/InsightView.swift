@@ -11,22 +11,30 @@ struct InsightView: View {
     let label: String
     let value: Int
     
+    @State private var localValue: Int = 0
+    
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.black.gradient.opacity(0.6))
             .frame(width: 100, height: 100)
             .overlay {
                 VStack {
-                    Text(String(value))
+                    Text(String(localValue))
+                        .contentTransition(.numericText())
                         .font(.largeTitle)
                         .fontWeight(.semibold)
                         .fontDesign(.monospaced)
                     
+                    
                     Text(label)
                         .font(.title2)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.black)
-
+                        .foregroundStyle(.secondary)
+                    
+                }
+            }
+            .onAppear {
+                withAnimation {
+                    localValue = value
                 }
             }
     }
