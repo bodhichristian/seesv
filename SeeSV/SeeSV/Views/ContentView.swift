@@ -28,10 +28,14 @@ struct ContentView: View {
                                         
                     
                     if let insights = csvService.insights {
-                        Text("Total posts: \(insights.totalPosts)")
-                        Text("Total likes: \(insights.totalLikes)")
-                        Text("Total follows: \(insights.totalNewFollowers)")
-                        Text("Total unfollows: \(insights.totalUnfollows)")
+                        
+                        HStack {
+                            InsightView(label: "Posts", value: insights.totalPosts)
+                            InsightView(label: "Likes", value: insights.totalLikes)
+                            InsightView(label: "Follows", value: insights.totalNewFollowers)
+                            InsightView(label: "Unfollows", value: insights.totalUnfollows)
+                        }
+                        .padding()
                     }
                 }
                 
