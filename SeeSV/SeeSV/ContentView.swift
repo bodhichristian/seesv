@@ -8,14 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var service = CSVService()
-    @State private var headers: [String] = []
-    @State private var rows: [[String]] = []
+    @Environment(CSVService.self) var csvService
+
     @State private var hasDroppedFile: Bool = false
     
     var body: some View {
         VStack {
-            if headers.isEmpty {
+            if csvService.headers.isEmpty {
                 Text("Drag & Drop a CSV file here")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.gray.opacity(0.2))
@@ -24,7 +23,17 @@ struct ContentView: View {
                         handleFileDrop(providers)
                     }
             } else {
-                TableView(headers: headers, rows: rows)
+                VStack {
+                    TableView(headers: csvService.headers, rows: csvService.rows)
+                                        
+                    
+                    if let insights = csvService.insights {
+                        Text("Total posts: \(insights.totalPosts)")
+                        Text("Total likes: \(insights.totalLikes)")
+                        Text("Total follows: \(insights.totalNewFollowers)")
+                        Text("Total unfollows: \(insights.totalUnfollows)")
+                    }
+                }
                 
             }
         }
@@ -39,12 +48,11 @@ struct ContentView: View {
                    let url = URL(dataRepresentation: urlData, relativeTo: nil) {
                     
                     Task {
-                        let csvData = try service.readCSV(filePath: url.path)
-                        
-                        guard let csvHeaders = csvData.first else { return }
-                        let csvRows = Array(csvData.dropFirst())
-                        headers = csvHeaders
-                        rows = csvRows
+                        do {
+                            try csvService.readCSV(filePath: url.path)
+                        } catch {
+                            print(error.localizedDescription)
+                        }
                     }
                 }
             }
