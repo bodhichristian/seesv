@@ -50,9 +50,33 @@ class CSVService {
     func calculateTotals(df: PythonObject) throws -> Insights {
         let posts = Int(df["create_post"].sum()) ?? 0
         let likes = Int(df["likes"].sum()) ?? 0
+        
+        let impressions = Int(df["impressions"].sum()) ?? 0
+        let engagements = Int(df["engagements"].sum()) ?? 0
+        let engagementRate = Double(engagements) / Double(impressions) * 100
+        let avgDailyEngagment = Double((df["engagements"] / df["impressions"]).sum()) ?? 0
+        
+        let profileVists = Int(df["profile_visits"].sum()) ?? 0
         let newFollowers = Int(df["new_follows"].sum()) ?? 0
         let unfollows = Int(df["unfollows"].sum()) ?? 0
-        let insights = Insights(totalPosts: posts, totalLikes: likes, totalNewFollowers: newFollowers, totalUnfollows: unfollows)
+        let netFollowerChange = newFollowers - unfollows
+        
+        let insights = Insights(
+            totalPosts: posts,
+            totalLikes: likes,
+            totalImpressions: impressions,
+            totalEngagements: engagements,
+            engagementRate: engagementRate,
+            avgDailyEngagment: avgDailyEngagment,
+            profileVists: profileVists,
+            totalNewFollowers: newFollowers,
+            totalUnfollows: unfollows,
+            netFollowerChange: netFollowerChange
+        )
         return insights
     }
 }
+
+
+
+

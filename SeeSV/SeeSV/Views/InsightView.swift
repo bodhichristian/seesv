@@ -6,34 +6,56 @@
 //
 
 import SwiftUI
+import SwiftUI
 
-struct InsightView: View {
+struct InsightView<T: Numeric & Comparable>: View {
     let label: String
-    let value: Int
+    let value: T
     
-    @State private var localValue: Int = 0
+    @State private var localValue: T = 0
+    
+    var formattedValue: String {
+        if let doubleValue = localValue as? Double {
+            return formatNumber(doubleValue, isInteger: false)
+        } else if let intValue = localValue as? Int {
+            return formatNumber(Double(intValue), isInteger: true)
+        } else {
+            return String(describing: localValue)
+        }
+    }
+    
+    func formatNumber(_ number: Double, isInteger: Bool) -> String {
+        if number >= 100_000 {
+            return String(format: "%.0fk", number / 1_000)
+        } else if number >= 1_000 {
+            return String(format: "%.1fk", number / 1_000)
+        } else {
+            return isInteger ? String(format: "%.0f", number) : String(format: "%.1f", number)
+        }
+    }
     
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
             .foregroundStyle(.black.gradient.opacity(0.6))
-            .frame(width: 100, height: 100)
+            .frame(width: 150, height: 100)
             .overlay {
                 VStack {
-                    Text(String(localValue))
-                        .contentTransition(.numericText())
-                        .font(.largeTitle)
+                    Text(formattedValue)
+                        .contentTransition(.numericText()) // Works now because text updates reactively
+                        .font(.system(size: 40))
                         .fontWeight(.semibold)
-                        .fontDesign(.monospaced)
-                    
+                        .foregroundStyle(.twitterBlue)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                     
                     Text(label)
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                    
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                 }
+                .padding()
             }
             .onAppear {
-                withAnimation {
+                withAnimation(.easeOut(duration: 1.0)) {
                     localValue = value
                 }
             }

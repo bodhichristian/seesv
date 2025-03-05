@@ -25,15 +25,38 @@ struct ContentView: View {
             } else {
                 VStack {
                     TableView(headers: csvService.headers, rows: csvService.rows)
-                                        
                     
                     if let insights = csvService.insights {
                         
                         HStack {
-                            InsightView(label: "Posts", value: insights.totalPosts)
-                            InsightView(label: "Likes", value: insights.totalLikes)
-                            InsightView(label: "Follows", value: insights.totalNewFollowers)
-                            InsightView(label: "Unfollows", value: insights.totalUnfollows)
+                            VStack {
+                                Text("Insights")
+                                    .font(.largeTitle)
+                                    .frame(width: 300, height: 100)
+                                HStack {
+                                    InsightView(label: "Posts", value: insights.totalPosts)
+                                    InsightView(label: "Likes", value: insights.totalLikes)
+                                }
+                            }
+                            
+                            
+                            VStack {
+                                // Upper right row
+                                HStack {
+                                    InsightView(label: "Impressions", value: insights.totalImpressions)
+                                    InsightView(label: "Engagements", value: insights.totalEngagements)
+                                    InsightView(label: "Engagement Rate", value: insights.engagementRate)
+                                    InsightView(label: "Daily Average", value: insights.avgDailyEngagment)
+                                }
+                                
+                                // Lower right row
+                                HStack {
+                                    InsightView(label: "Profile Visits", value: insights.profileVists)
+                                    InsightView(label: "Follower Change", value: insights.netFollowerChange)
+                                    InsightView(label: "Follows", value: insights.totalNewFollowers)
+                                    InsightView(label: "Unfollows", value: insights.totalUnfollows)
+                                }
+                            }
                         }
                         .padding()
                     }
@@ -42,7 +65,6 @@ struct ContentView: View {
             }
         }
     }
-    
     
     func handleFileDrop(_ providers: [NSItemProvider]) -> Bool {
         guard let item = providers.first else { return false }
