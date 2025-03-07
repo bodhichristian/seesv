@@ -44,7 +44,7 @@ struct InsightView<T: Numeric & Comparable>: View {
                         .contentTransition(.numericText()) // Works now because text updates reactively
                         .font(.system(size: 40))
                         .fontWeight(.semibold)
-                        .foregroundStyle(.twitterBlue)
+                        .foregroundStyle(.twitterBlue.gradient)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                     
                     Text(label)
@@ -55,7 +55,7 @@ struct InsightView<T: Numeric & Comparable>: View {
                 .padding()
             }
             .onAppear {
-                withAnimation(.easeOut(duration: 1.0)) {
+                withAnimation {
                     localValue = value
                 }
             }

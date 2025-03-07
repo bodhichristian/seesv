@@ -9,17 +9,36 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(CSVService.self) var csvService
-
-    @State private var hasDroppedFile: Bool = false
+    
+    @State private var isTargeted: Bool = false
+    @State private var isLoading: Bool = false
+    
+//    private var message: String  {
+//        if isTargeted {
+//
+//        }
+//    }
     
     var body: some View {
         VStack {
-            if csvService.headers.isEmpty {
+            if isLoading {
+                VStack {
+                    ProgressView("Analyzing data...")
+                        .progressViewStyle(.linear)
+                        .font(.title2)
+                        .frame(maxWidth: 200)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.twitterBlue.opacity(0.2))
+                .transition(.opacity)
+            }
+            else if csvService.headers.isEmpty {
                 Text("Drag & Drop a CSV file here")
+                    .font(.title2)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.gray.opacity(0.2))
-                
-                    .onDrop(of: ["public.file-url"], isTargeted: nil) { providers in
+                    .background(isTargeted ? .twitterBlue.opacity(0.2) : .gray.opacity(0.2)) // Changes on hover
+                    .animation(.easeInOut, value: isTargeted)
+                    .onDrop(of: ["public.file-url"], isTargeted: $isTargeted) { providers in
                         handleFileDrop(providers)
                     }
             } else {
@@ -27,11 +46,10 @@ struct ContentView: View {
                     TableView(headers: csvService.headers, rows: csvService.rows)
                     
                     if let insights = csvService.insights {
-                        
                         HStack {
                             VStack {
-                                Text("Insights")
-                                    .font(.largeTitle)
+                                Text("Account Overview Insights")
+                                    .font(.title2)
                                     .frame(width: 300, height: 100)
                                 HStack {
                                     InsightView(label: "Posts", value: insights.totalPosts)
@@ -61,7 +79,6 @@ struct ContentView: View {
                         .padding()
                     }
                 }
-                
             }
         }
     }
@@ -73,11 +90,15 @@ struct ContentView: View {
                 if let urlData = urlData as? Data,
                    let url = URL(dataRepresentation: urlData, relativeTo: nil) {
                     
+                    isLoading = true// Show loading state
+                    
                     Task {
                         do {
-                            try csvService.readCSV(filePath: url.path)
+                            try  csvService.readCSV(filePath: url.path)
+                            withAnimation { isLoading = false }  // Hide loading state with animation
                         } catch {
                             print(error.localizedDescription)
+                            withAnimation { isLoading = false }  // Ensure loading state is reset
                         }
                     }
                 }
