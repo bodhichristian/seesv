@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct SeeSVApp: App {
@@ -13,8 +14,9 @@ struct SeeSVApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
                 .environment(csvService)
+                .modelContainer(for: CSVAnalysis.self)
         }
     }
 }

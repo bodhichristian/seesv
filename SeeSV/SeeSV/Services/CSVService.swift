@@ -10,11 +10,7 @@ import PythonKit
 
 @Observable
 class CSVService {
-    var headers: [String] = []
-    var rows: [[String]] = []
-    var insights: Insights? = nil
-    
-    func readCSV(filePath: String) throws {
+    static func readCSV(filePath: String) throws -> CSVAnalysis {
         let sys = Python.import("sys")
         let pandas = Python.import("pandas")
 
@@ -40,14 +36,15 @@ class CSVService {
                 print("Error: Row conversion failed.")
             }
             
-            headers = dfHeaders
-            rows = dfRows
+            let insights = try CSVService.calculateInsights(for: df)
             
-            insights = try calculateTotals(df: df)
+            let analysis = CSVAnalysis(headers: dfHeaders, rows: dfRows, insights: insights)
+            
+            return analysis
         }
     }
     
-    func calculateTotals(df: PythonObject) throws -> Insights {
+    static func calculateInsights(for df: PythonObject) throws -> Insights {
         let posts = Int(df["create_post"].sum()) ?? 0
         let likes = Int(df["likes"].sum()) ?? 0
         

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Insights {
+struct Insights: Codable {
     // Posts
     let totalPosts: Int
     let totalLikes: Int
@@ -23,5 +23,4 @@ struct Insights {
     let totalNewFollowers: Int
     let totalUnfollows: Int
     let netFollowerChange: Int
-
 }
