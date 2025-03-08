@@ -11,8 +11,12 @@ import SwiftData
 struct MainView: View {
     @Environment(\.modelContext) var modelContext
     
-    @Query var analyses: [CSVAnalysis]
+    @Query(sort: \CSVAnalysis.dateCreated) var analyses: [CSVAnalysis]
     @State private var selectedAnalysis: CSVAnalysis?
+    @State private var newAnalysisTitle = "New Analysis"
+    @State private var creatingNewAnalysis = false
+    @FocusState private var titleFieldFocused
+
     
     var body: some View {
         NavigationSplitView {
@@ -33,13 +37,35 @@ struct MainView: View {
                     Text(analysis.name)
                         .tag(analysis)
                 }
+                if creatingNewAnalysis {
+                    HStack {
+    //                    Image(systemName: "list.bullet.circle.fill")
+    //                        .foregroundStyle(.blue)
+    //                        .offset(x: 3)
+                        TextField("New List", text: $newAnalysisTitle)
+                            .textFieldStyle(.plain)
+                            .focused($titleFieldFocused)
+                            .offset(x: 1)
+                    }
+                    .onChange(of: titleFieldFocused) {
+                        if !titleFieldFocused {
+                            selectedAnalysis?.name = newAnalysisTitle
+                            creatingNewAnalysis = false
+                        }
+                    }
+                }
+                
             }
             
+           
+            
             Button("New Analysis") {
+                creatingNewAnalysis = true
                 let newAnalysis = CSVAnalysis()
                 
                 modelContext.insert(newAnalysis)
                 selectedAnalysis = newAnalysis
+                titleFieldFocused = true
             }
             .buttonStyle(.bordered)
             .padding()

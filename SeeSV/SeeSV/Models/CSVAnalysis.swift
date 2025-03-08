@@ -11,6 +11,7 @@ import SwiftData
 @Model
 class CSVAnalysis {
     var id: UUID = UUID()
+    var dateCreated = Date.now
     var name: String
     var headers: [String]
     var rows: [[String]]
