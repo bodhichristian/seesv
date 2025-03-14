@@ -12,20 +12,20 @@ struct MainView: View {
     @Environment(\.modelContext) var modelContext
     
     @Query(sort: \CSVAnalysis.dateCreated) var analyses: [CSVAnalysis]
-    @State private var selectedAnalysis: CSVAnalysis?
+    @State private var selectedAnalysis: CSVAnalysis? = nil
     @State private var newAnalysisTitle = "New Analysis"
     @State private var creatingNewAnalysis = false
     @FocusState private var titleFieldFocused
-
+    
     
     var body: some View {
         NavigationSplitView {
             sidebar
         } detail: {
-            if selectedAnalysis?.headers == [] {
-                DragDropView(selectedAnalysis: $selectedAnalysis)
+            if creatingNewAnalysis {
+                DragDropView(selectedAnalysis: $selectedAnalysis, creatingNewAnalysis: $creatingNewAnalysis)
             } else {
-                AnalysisView(analysis: selectedAnalysis ?? CSVAnalysis())
+                AnalysisView(selectedAnalysis: $selectedAnalysis)
             }
         }
     }
@@ -34,43 +34,33 @@ struct MainView: View {
         VStack {
             List(selection: $selectedAnalysis) {
                 ForEach(analyses) { analysis in
-                    Text(analysis.name)
+                    FlexibleTextField(analysis: analysis)
                         .tag(analysis)
-                }
-                if creatingNewAnalysis {
-                    HStack {
-    //                    Image(systemName: "list.bullet.circle.fill")
-    //                        .foregroundStyle(.blue)
-    //                        .offset(x: 3)
-                        TextField("New List", text: $newAnalysisTitle)
-                            .textFieldStyle(.plain)
-                            .focused($titleFieldFocused)
-                            .offset(x: 1)
-                    }
-                    .onChange(of: titleFieldFocused) {
-                        if !titleFieldFocused {
-                            selectedAnalysis?.name = newAnalysisTitle
-                            creatingNewAnalysis = false
+                        .contextMenu {
+                            Button("Delete \"\(selectedAnalysis?.name ?? "Analysis")\"", role: .destructive) {
+                                deleteAnalysis(analysis)
+                            }
                         }
-                    }
                 }
-                
             }
-            
-           
-            
+
             Button("New Analysis") {
                 creatingNewAnalysis = true
                 let newAnalysis = CSVAnalysis()
                 
                 modelContext.insert(newAnalysis)
                 selectedAnalysis = newAnalysis
-                titleFieldFocused = true
             }
             .buttonStyle(.bordered)
             .padding()
         }
         .frame(minWidth: 200)
+    }
+    
+    private func deleteAnalysis(_ analysis: CSVAnalysis) {
+        withAnimation {
+            modelContext.delete(analysis)
+        }
     }
 }
 

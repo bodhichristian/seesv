@@ -10,6 +10,7 @@ import SwiftUI
 struct DragDropView: View {
     @Environment(\.modelContext) var modelContext
     @Binding var selectedAnalysis: CSVAnalysis?
+    @Binding var creatingNewAnalysis: Bool
     @State private var isTargeted: Bool = false
     @State private var isLoading: Bool = false
     
@@ -38,21 +39,17 @@ struct DragDropView: View {
                     isLoading = true// Show loading state
                     
                     Task {
-                        do {
-                            let newAnalysis = try  CSVService.readCSV(filePath: url.path)
+                        if selectedAnalysis != nil {
+                            let analysis = CSVService.readCSV(filePath: url.path)
                             
-                            if selectedAnalysis == nil {
-                                modelContext.insert(newAnalysis)
-                            } else {
-                                selectedAnalysis?.headers = newAnalysis.headers
-                                selectedAnalysis?.rows = newAnalysis.rows
-                                selectedAnalysis?.insights = newAnalysis.insights
+                            selectedAnalysis?.headers = analysis.headers
+                            selectedAnalysis?.rows = analysis.rows
+                            selectedAnalysis?.insights = analysis.insights
+                            
+                            withAnimation {
+                                creatingNewAnalysis = false
+                                isLoading = false
                             }
-                            
-                            withAnimation { isLoading = false }  // Hide loading state with animation
-                        } catch {
-                            print(error.localizedDescription)
-                            withAnimation { isLoading = false }  // Ensure loading state is reset
                         }
                     }
                 }
@@ -63,5 +60,5 @@ struct DragDropView: View {
 }
 
 #Preview {
-    DragDropView(selectedAnalysis: .constant(CSVAnalysis()))
+    DragDropView(selectedAnalysis: .constant(CSVAnalysis()), creatingNewAnalysis: .constant(false))
 }

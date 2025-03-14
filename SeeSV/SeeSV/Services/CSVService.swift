@@ -8,43 +8,32 @@
 import Foundation
 import PythonKit
 
-@Observable
 class CSVService {
-    static func readCSV(filePath: String) throws -> CSVAnalysis {
-        let sys = Python.import("sys")
-        let pandas = Python.import("pandas")
-
-        // Python installation path
-        sys.path.append("/Library/Frameworks/Python.framework/Versions/Current/lib/python3.9/site-packages")
-
-        do {
-            // Read CSV using Pandas
-            let df = pandas.read_csv(filePath)
-
-            // Convert column names to snake_case
-            df.columns = df.columns.str.replace(" ", "_").str.lower()
-
-            // Convert column names to Swift array
-            guard let dfHeaders = df.columns.tolist().map({ "\($0)" }) as? [String] else {
-                print("Error: Column conversion failed.")
-            }
-
-            // Convert rows to Swift array
-            guard let dfRows = df.values.tolist().map({ row in
-                row.map { "\($0)" }
-            }) as? [[String]] else {
-                print("Error: Row conversion failed.")
-            }
-            
-            let insights = try CSVService.calculateInsights(for: df)
-            
-            let analysis = CSVAnalysis(headers: dfHeaders, rows: dfRows, insights: insights)
-            
-            return analysis
+    static let sys = Python.import("sys").path.append("/Library/Frameworks/Python.framework/Versions/Current/lib/python3.9/site-packages")
+    static let pd = Python.import("pandas")
+    
+    static func readCSV(filePath: String) -> CSVAnalysis {
+        let df = pd.read_csv(filePath)
+        df.columns = df.columns.str.replace(" ", "_").str.lower()
+        
+        // Convert column names to Swift array
+        let pyHeaders = df.columns.tolist()
+        let headersArray = Array(pyHeaders) // Convert Python list to Swift array of PythonObject
+        let headers = headersArray.map { "\($0)" } // Convert each element to String
+        
+        // Convert rows to Swift array
+        let pyRows = df.values.tolist()
+        let rowsArray = Array(pyRows) // Convert Python list to Swift array of PythonObject
+        let rows = rowsArray.map { row in
+            let rowArray = Array(row) // Convert inner Python list to Swift array
+            return rowArray.map { "\($0)" } // Convert each element to String
         }
+        
+        let insights = CSVService.calculateInsights(for: df)
+        return CSVAnalysis(headers: headers, rows: rows, insights: insights)
     }
     
-    static func calculateInsights(for df: PythonObject) throws -> Insights {
+    static func calculateInsights(for df: PythonObject) -> Insights {
         let posts = Int(df["create_post"].sum()) ?? 0
         let likes = Int(df["likes"].sum()) ?? 0
         

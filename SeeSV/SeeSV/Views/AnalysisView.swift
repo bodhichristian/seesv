@@ -9,17 +9,20 @@ import SwiftUI
 import SwiftData
 
 struct AnalysisView: View {
-    @Environment(CSVService.self) var csvService
     @Environment(\.modelContext) var modelContext
     
-    let analysis: CSVAnalysis
+    @Binding var selectedAnalysis: CSVAnalysis?
     
     var body: some View {
         VStack {
             VStack {
-                TableView(headers: analysis.headers, rows: analysis.rows)
-                
-                if let insights = analysis.insights {
+                if let selectedAnalysis {
+                    TableView(headers: selectedAnalysis.headers, rows: selectedAnalysis.rows)
+                    
+                    
+                    
+                }
+                if let insights = selectedAnalysis?.insights {
                     HStack {
                         VStack {
                             Text("Account Overview Insights")
@@ -57,5 +60,5 @@ struct AnalysisView: View {
 }
 
 #Preview {
-    AnalysisView(analysis: CSVAnalysis.mock())
+    AnalysisView(selectedAnalysis: .constant(CSVAnalysis.mock()))
 }

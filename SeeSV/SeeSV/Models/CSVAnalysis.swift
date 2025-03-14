@@ -19,7 +19,7 @@ class CSVAnalysis {
     @Attribute(.externalStorage)
     var insights: Insights?
     
-    init(name: String = "New Analysis", headers: [String] = [], rows: [[String]] = [[]], insights: Insights? = nil) {
+    init(name: String = Date.now.formatted(date: .abbreviated, time: .shortened), headers: [String] = [], rows: [[String]] = [[]], insights: Insights? = nil) {
         self.name = name
         self.headers = headers
         self.rows = rows
