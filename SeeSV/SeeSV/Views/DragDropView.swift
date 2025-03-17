@@ -39,17 +39,12 @@ struct DragDropView: View {
                     isLoading = true// Show loading state
                     
                     Task {
-                        if selectedAnalysis != nil {
-                            let analysis = CSVService.readCSV(filePath: url.path)
-                            
-                            selectedAnalysis?.headers = analysis.headers
-                            selectedAnalysis?.rows = analysis.rows
-                            selectedAnalysis?.insights = analysis.insights
-                            
-                            withAnimation {
-                                creatingNewAnalysis = false
-                                isLoading = false
-                            }
+                        let analysis = CSVService.readCSV(filePath: url.path)
+                        modelContext.insert(analysis)
+                        selectedAnalysis = analysis
+                        withAnimation {
+                            creatingNewAnalysis = false
+                            isLoading = false
                         }
                     }
                 }

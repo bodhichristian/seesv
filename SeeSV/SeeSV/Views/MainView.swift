@@ -10,13 +10,13 @@ import SwiftData
 
 struct MainView: View {
     @Environment(\.modelContext) var modelContext
+    @FocusState private var titleFieldFocused
     
     @Query(sort: \CSVAnalysis.dateCreated) var analyses: [CSVAnalysis]
+    
     @State private var selectedAnalysis: CSVAnalysis? = nil
     @State private var newAnalysisTitle = "New Analysis"
     @State private var creatingNewAnalysis = false
-    @FocusState private var titleFieldFocused
-    
     
     var body: some View {
         NavigationSplitView {
@@ -25,7 +25,9 @@ struct MainView: View {
             if creatingNewAnalysis {
                 DragDropView(selectedAnalysis: $selectedAnalysis, creatingNewAnalysis: $creatingNewAnalysis)
             } else {
-                AnalysisView(selectedAnalysis: $selectedAnalysis)
+                if let selectedAnalysis {
+                    AnalysisView(analysis: selectedAnalysis)
+                }
             }
         }
     }
@@ -46,10 +48,6 @@ struct MainView: View {
 
             Button("New Analysis") {
                 creatingNewAnalysis = true
-                let newAnalysis = CSVAnalysis()
-                
-                modelContext.insert(newAnalysis)
-                selectedAnalysis = newAnalysis
             }
             .buttonStyle(.bordered)
             .padding()
