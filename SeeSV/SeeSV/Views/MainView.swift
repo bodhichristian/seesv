@@ -14,51 +14,92 @@ struct MainView: View {
     
     @Query(sort: \CSVAnalysis.dateCreated) var analyses: [CSVAnalysis]
     
-    @State private var selectedAnalysis: CSVAnalysis? = nil
+    // Use Set for multi-selection
+    @State private var selectedAnalyses: Set<CSVAnalysis> = []
     @State private var newAnalysisTitle = "New Analysis"
     @State private var creatingNewAnalysis = false
+    // Track when multiple items are selected
+    @State private var isMultiSelectionActive = false
     
     var body: some View {
         NavigationSplitView {
             sidebar
         } detail: {
             if creatingNewAnalysis {
-                DragDropView(selectedAnalysis: $selectedAnalysis, creatingNewAnalysis: $creatingNewAnalysis)
+                DragDropView(selectedAnalysis: Binding(
+                    get: { selectedAnalyses.first },
+                    set: { if let newValue = $0 { selectedAnalyses = [newValue] } }
+                ), creatingNewAnalysis: $creatingNewAnalysis)
             } else {
-                if let selectedAnalysis {
-                    AnalysisView(analysis: selectedAnalysis)
-                        .id(selectedAnalysis.id)
+                if !selectedAnalyses.isEmpty {
+                    if selectedAnalyses.count == 1, let selectedAnalysis = selectedAnalyses.first {
+                        AnalysisView(analysis: selectedAnalysis)
+                            .id(selectedAnalysis.id)
+                    } else {
+                        MultiSelectionView(selectedAnalyses: $selectedAnalyses)
+                    }
+                } else {
+                    Text("Select an analysis to view details")
                 }
             }
+        }
+        .onChange(of: selectedAnalyses) { oldValue, newValue in
+            isMultiSelectionActive = newValue.count > 1
         }
     }
     
     private var sidebar: some View {
         VStack {
-            List(selection: $selectedAnalysis) {
+            // List with multi-selection enabled via Set binding
+            List(selection: $selectedAnalyses) {
                 ForEach(analyses) { analysis in
                     FlexibleTextField(analysis: analysis)
                         .tag(analysis)
                         .contextMenu {
-                            Button("Delete \"\(selectedAnalysis?.name ?? "Analysis")\"", role: .destructive) {
-                                deleteAnalysis(analysis)
+                            
+                            Button("Delete \"\(analysis.name)\"", role: .destructive) {
+                                deleteAnalyses([analysis])
                             }
                         }
                 }
             }
-
-            Button("New Analysis") {
-                creatingNewAnalysis = true
+            
+            HStack {
+                Button("New Analysis") {
+                    creatingNewAnalysis = true
+                }
+                .buttonStyle(.bordered)
+                
+                Button("Delete Selected") {
+                    deleteAnalyses(Array(selectedAnalyses))
+                }
+                .buttonStyle(.bordered)
+                .disabled(selectedAnalyses.isEmpty)
             }
-            .buttonStyle(.bordered)
             .padding()
         }
         .frame(minWidth: 200)
     }
     
-    private func deleteAnalysis(_ analysis: CSVAnalysis) {
+    private func deleteAnalyses(_ analysesToDelete: [CSVAnalysis]) {
         withAnimation {
-            modelContext.delete(analysis)
+            analysesToDelete.forEach { analysis in
+                modelContext.delete(analysis)
+            }
+            selectedAnalyses.removeAll() // Clear selection after deletion
+        }
+    }
+}
+
+// Placeholder for multi-selection view
+struct MultiSelectionView: View {
+    @Binding var selectedAnalyses: Set<CSVAnalysis>
+    
+    var body: some View {
+        VStack {
+            Text("Multiple Analyses Selected: \(selectedAnalyses.count)")
+                .font(.headline)
+            Text("Select a single analysis to view details or delete multiple from the sidebar.")
         }
     }
 }
