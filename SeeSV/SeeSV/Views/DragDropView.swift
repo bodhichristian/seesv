@@ -41,6 +41,7 @@ struct DragDropView: View {
                     Task {
                         let analysis = CSVService.readCSV(filePath: url.path)
                         modelContext.insert(analysis)
+                        try modelContext.save()
                         selectedAnalysis = analysis
                         withAnimation {
                             creatingNewAnalysis = false

@@ -27,6 +27,7 @@ struct MainView: View {
             } else {
                 if let selectedAnalysis {
                     AnalysisView(analysis: selectedAnalysis)
+                        .id(selectedAnalysis.id)
                 }
             }
         }

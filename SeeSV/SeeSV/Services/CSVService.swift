@@ -47,6 +47,7 @@ class CSVService {
         let unfollows = Int(df["unfollows"].sum()) ?? 0
         let netFollowerChange = newFollowers - unfollows
         
+        
         let insights = Insights(
             totalPosts: posts,
             totalLikes: likes,
@@ -59,6 +60,8 @@ class CSVService {
             totalUnfollows: unfollows,
             netFollowerChange: netFollowerChange
         )
+        
+        print("Total Likes: \(insights.totalLikes)")
         return insights
     }
 }
