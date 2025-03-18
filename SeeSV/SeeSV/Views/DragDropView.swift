@@ -18,14 +18,22 @@ struct DragDropView: View {
         if isLoading {
             LoadingView()
         } else {
-            Text("Drag & Drop a CSV file here")
-                .font(.title2)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(isTargeted ? .twitterBlue.opacity(0.2) : .gray.opacity(0.2)) // Changes on hover
-                .animation(.easeInOut, value: isTargeted)
-                .onDrop(of: ["public.file-url"], isTargeted: $isTargeted) { providers in
-                    handleFileDrop(providers)
-                }
+            ZStack {
+                RoundedRectangle(cornerRadius: 20)
+                    .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [10]))
+                    .foregroundStyle(.twitterBlue)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding()
+                
+                Text("Drag & Drop a CSV file here")
+                    .font(.title2)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(isTargeted ? .twitterBlue.opacity(0.2) : .gray.opacity(0.2)) // Changes on hover
+                    .animation(.easeInOut, value: isTargeted)
+                    .onDrop(of: ["public.file-url"], isTargeted: $isTargeted) { providers in
+                        handleFileDrop(providers)
+                    }
+            }
         }
     }
     

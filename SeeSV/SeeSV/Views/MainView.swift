@@ -25,21 +25,25 @@ struct MainView: View {
         NavigationSplitView {
             sidebar
         } detail: {
-            if creatingNewAnalysis {
-                DragDropView(selectedAnalysis: Binding(
-                    get: { selectedAnalyses.first },
-                    set: { if let newValue = $0 { selectedAnalyses = [newValue] } }
-                ), creatingNewAnalysis: $creatingNewAnalysis)
+            if selectedAnalyses.isEmpty && creatingNewAnalysis == false{
+                WelcomeView()
             } else {
-                if !selectedAnalyses.isEmpty {
-                    if selectedAnalyses.count == 1, let selectedAnalysis = selectedAnalyses.first {
-                        AnalysisView(analysis: selectedAnalysis)
-                            .id(selectedAnalysis.id)
-                    } else {
-                        MultiSelectionView(selectedAnalyses: $selectedAnalyses)
-                    }
+                if creatingNewAnalysis {
+                    DragDropView(selectedAnalysis: Binding(
+                        get: { selectedAnalyses.first },
+                        set: { if let newValue = $0 { selectedAnalyses = [newValue] } }
+                    ), creatingNewAnalysis: $creatingNewAnalysis)
                 } else {
-                    Text("Select an analysis to view details")
+                    if !selectedAnalyses.isEmpty {
+                        if selectedAnalyses.count == 1, let selectedAnalysis = selectedAnalyses.first {
+                            AnalysisView(analysis: selectedAnalysis)
+                                .id(selectedAnalysis.id)
+                        } else {
+                            MultiSelectionView(selectedAnalyses: $selectedAnalyses)
+                        }
+                    } else {
+                        Text("Select an analysis to view details")
+                    }
                 }
             }
         }
@@ -50,43 +54,34 @@ struct MainView: View {
     
     private var sidebar: some View {
         VStack {
-            // List with multi-selection enabled via Set binding
             List(selection: $selectedAnalyses) {
                 ForEach(analyses) { analysis in
                     FlexibleTextField(analysis: analysis)
                         .tag(analysis)
                         .contextMenu {
-                            
                             Button("Delete \"\(analysis.name)\"", role: .destructive) {
-                                deleteAnalyses([analysis])
+                                delete([analysis])
                             }
                         }
                 }
             }
             
-            HStack {
-                Button("New Analysis") {
-                    creatingNewAnalysis = true
-                }
-                .buttonStyle(.bordered)
-                
-                Button("Delete Selected") {
-                    deleteAnalyses(Array(selectedAnalyses))
-                }
-                .buttonStyle(.bordered)
-                .disabled(selectedAnalyses.isEmpty)
+            
+            Button("New Analysis") {
+                creatingNewAnalysis = true
             }
+            .buttonStyle(.bordered)
             .padding()
         }
         .frame(minWidth: 200)
     }
     
-    private func deleteAnalyses(_ analysesToDelete: [CSVAnalysis]) {
+    private func delete(_ analyses: [CSVAnalysis]) {
         withAnimation {
-            analysesToDelete.forEach { analysis in
+            analyses.forEach { analysis in
                 modelContext.delete(analysis)
             }
-            selectedAnalyses.removeAll() // Clear selection after deletion
+            selectedAnalyses.removeAll()
         }
     }
 }
@@ -97,7 +92,7 @@ struct MultiSelectionView: View {
     
     var body: some View {
         VStack {
-            Text("Multiple Analyses Selected: \(selectedAnalyses.count)")
+            Text("\(selectedAnalyses.count) Selected: ")
                 .font(.headline)
             Text("Select a single analysis to view details or delete multiple from the sidebar.")
         }
