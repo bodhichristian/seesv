@@ -12,11 +12,18 @@ struct FlexibleTextField: View {
     @FocusState private var isEditing
 
     var body: some View {
-        TextField("", text: $analysis.name)
-            .textFieldStyle(.plain)
-            .focused($isEditing)
-            .onTapGesture(count: 2) { isEditing = true }
-            .onSubmit { isEditing = false }
+        HStack {
+            TextField("", text: $analysis.name)
+                .textFieldStyle(.plain)
+                .focused($isEditing)
+                .onTapGesture(count: 2) { isEditing = true }
+                .onSubmit { isEditing = false }
+            
+            if analysis.isFavorite {
+                Image(systemName: "star.fill")
+                    .foregroundStyle(.yellow)
+            }
+        }
     }
 }
 

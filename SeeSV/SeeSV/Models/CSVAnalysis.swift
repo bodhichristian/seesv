@@ -15,6 +15,7 @@ class CSVAnalysis {
     var name: String
     var headers: [String]
     var rows: [[String]]
+    var isFavorite: Bool = false
     
     @Attribute(.externalStorage)
     var insights: Insights?
