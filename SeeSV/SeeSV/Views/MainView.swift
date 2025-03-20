@@ -17,6 +17,12 @@ struct MainView: View {
     @State private var selection: Set<CSVAnalysis> = []
     @State private var newAnalysisTitle = "New Analysis"
     @State private var isAnalyzing = false
+    
+    @State private var isHoveringImport = false
+    @State private var isHoveringExport = false
+    @State private var isHoveringFavorites = false
+    @State private var isHoveringRecentlyDeleted = false
+    
     @State private var multipleItemsSelected = false
     @State private var filteringFavorites: Bool = false
     
@@ -75,10 +81,20 @@ struct MainView: View {
                                     .padding(2)
                                 
                                 Text("Import CSV")
-                                    .font(.caption)
+                                    .font(.subheadline)
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(.primary)
                         }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.twitterBlue, lineWidth: 1)
+                                .opacity(isHoveringImport ? 1 : 0)
+                        }
+                        .onHover { hovering in
+                                withAnimation(.easeInOut(duration: 0.1)) {
+                                    isHoveringImport = hovering
+                                }
+                            }
                         .onTapGesture {
                             importCSVFile()
                         }
@@ -94,11 +110,21 @@ struct MainView: View {
                                     .padding(2)
                                 
                                 Text("Export Analysis")
-                                    .font(.caption)
+                                    .font(.subheadline)
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(.primary)
 
                         }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.green, lineWidth: 1)
+                                .opacity(isHoveringExport ? 1 : 0)
+                        }
+                        .onHover { hovering in
+                                withAnimation(.easeInOut(duration: 0.1)) {
+                                    isHoveringExport = hovering
+                                }
+                            }
                         .onTapGesture {
                             // export logic
                         }
@@ -112,13 +138,24 @@ struct MainView: View {
                             VStack {
                                 Image(systemName: filteringFavorites ? "star.fill" : "star")
                                     .font(.title2)
+                                    .foregroundStyle(filteringFavorites ? .yellow : .primary)
                                     .padding(2)
                                 
                                 Text("Favorites")
-                                    .font(.caption)
+                                    .font(.subheadline)
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(.primary)
                         }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.yellow, lineWidth: 1)
+                                .opacity(isHoveringFavorites ? 1 : 0)
+                        }
+                        .onHover { hovering in
+                                withAnimation(.easeInOut(duration: 0.1)) {
+                                    isHoveringFavorites = hovering
+                                }
+                            }
                         .onTapGesture {
                             withAnimation {
                                 filteringFavorites.toggle()
@@ -135,11 +172,21 @@ struct MainView: View {
                                     .padding(2)
                                 
                                 Text("Recently deleted")
-                                    .font(.caption)
+                                    .font(.subheadline)
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(.primary)
                             
                         }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.red, lineWidth: 1)
+                                .opacity(isHoveringRecentlyDeleted ? 1 : 0)
+                        }
+                        .onHover { hovering in
+                                withAnimation(.easeInOut(duration: 0.1)) {
+                                    isHoveringRecentlyDeleted = hovering
+                                }
+                            }
                         .onTapGesture {
                             // favorite logic
                         }
