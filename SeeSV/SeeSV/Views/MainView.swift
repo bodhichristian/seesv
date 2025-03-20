@@ -71,124 +71,34 @@ struct MainView: View {
             
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(.twitterBlue.opacity(0.2))
-                        .frame(height: 60)
-                        .overlay {
-                            VStack {
-                                Image(systemName: "plus.circle")
-                                    .font(.title2)
-                                    .padding(2)
-                                
-                                Text("Import CSV")
-                                    .font(.subheadline)
-                            }
-                            .foregroundColor(.primary)
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.twitterBlue, lineWidth: 1)
-                                .opacity(isHoveringImport ? 1 : 0)
-                        }
-                        .onHover { hovering in
-                                withAnimation(.easeInOut(duration: 0.1)) {
-                                    isHoveringImport = hovering
-                                }
-                            }
-                        .onTapGesture {
+                    SidebarGridItem(
+                        label: "Import CSV",
+                        icon: "plus.circle",
+                        color: .twitterBlue) {
                             importCSVFile()
                         }
-                        
                     
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(.green.opacity(0.2))
-                        .frame(height: 60)
-                        .overlay {
-                            VStack {
-                                Image(systemName: "square.and.arrow.up.circle")
-                                    .font(.title2)
-                                    .padding(2)
-                                
-                                Text("Export Analysis")
-                                    .font(.subheadline)
-                            }
-                            .foregroundColor(.primary)
-
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.green, lineWidth: 1)
-                                .opacity(isHoveringExport ? 1 : 0)
-                        }
-                        .onHover { hovering in
-                                withAnimation(.easeInOut(duration: 0.1)) {
-                                    isHoveringExport = hovering
-                                }
-                            }
-                        .onTapGesture {
+                    SidebarGridItem(
+                        label: "Export Analysis",
+                        icon: "square.and.arrow.up.circle",
+                        color: .green) {
                             // export logic
                         }
                 }
                 
                 GridRow {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(.yellow.opacity(0.2))
-                        .frame(height: 60)
-                        .overlay {
-                            VStack {
-                                Image(systemName: filteringFavorites ? "star.fill" : "star")
-                                    .font(.title2)
-                                    .foregroundStyle(filteringFavorites ? .yellow : .primary)
-                                    .padding(2)
-                                
-                                Text("Favorites")
-                                    .font(.subheadline)
-                            }
-                            .foregroundColor(.primary)
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.yellow, lineWidth: 1)
-                                .opacity(isHoveringFavorites ? 1 : 0)
-                        }
-                        .onHover { hovering in
-                                withAnimation(.easeInOut(duration: 0.1)) {
-                                    isHoveringFavorites = hovering
-                                }
-                            }
-                        .onTapGesture {
-                            withAnimation {
-                                filteringFavorites.toggle()
-                            }
+                    SidebarGridItem(
+                        label: "Favorites",
+                        icon: filteringFavorites ? "star.fill" : "star",
+                        color: .yellow) {
+                            // export logic
                         }
                     
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(.red.opacity(0.2))
-                        .frame(height: 60)
-                        .overlay {
-                            VStack {
-                                Image(systemName: "trash")
-                                    .font(.title2)
-                                    .padding(2)
-                                
-                                Text("Recently deleted")
-                                    .font(.subheadline)
-                            }
-                            .foregroundColor(.primary)
-                            
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.red, lineWidth: 1)
-                                .opacity(isHoveringRecentlyDeleted ? 1 : 0)
-                        }
-                        .onHover { hovering in
-                                withAnimation(.easeInOut(duration: 0.1)) {
-                                    isHoveringRecentlyDeleted = hovering
-                                }
-                            }
-                        .onTapGesture {
-                            // favorite logic
+                    SidebarGridItem(
+                        label: "Recently Deleted",
+                        icon: "trash",
+                        color: .red) {
+                            // export logic
                         }
                 }
             }
@@ -244,7 +154,7 @@ struct MainView: View {
         panel.canChooseFiles = true
         //panel.allowed = ["csv"] // Filter for .csv files using extension
         isAnalyzing = true
-
+        
         if panel.runModal() == .OK, let url = panel.url {
             do {
                 let newAnalysis = CSVService.readCSV(filePath: url.path)
