@@ -32,7 +32,7 @@ struct SidebarGridItem: View {
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(.twitterBlue, lineWidth: 1)
+                    .stroke(color, lineWidth: 1)
                     .opacity(isHovered ? 1 : 0)
             }
             .onHover { hovering in

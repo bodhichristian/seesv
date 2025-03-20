@@ -14,17 +14,10 @@ struct MainView: View {
     
     @Query(sort: [SortDescriptor(\CSVAnalysis.dateCreated, order: .reverse)]) var analyses: [CSVAnalysis]
     
-    @State private var selection: Set<CSVAnalysis> = []
-    @State private var newAnalysisTitle = "New Analysis"
     @State private var isAnalyzing = false
-    
-    @State private var isHoveringImport = false
-    @State private var isHoveringExport = false
-    @State private var isHoveringFavorites = false
-    @State private var isHoveringRecentlyDeleted = false
-    
-    @State private var multipleItemsSelected = false
     @State private var filteringFavorites: Bool = false
+    @State private var multipleItemsSelected = false
+    @State private var selection: Set<CSVAnalysis> = []
     
     private var filteredAnalyses: [CSVAnalysis] {
         if filteringFavorites {
@@ -68,42 +61,12 @@ struct MainView: View {
     
     private var sidebar: some View {
         VStack {
-            
-            Grid(horizontalSpacing: 10, verticalSpacing: 10) {
-                GridRow {
-                    SidebarGridItem(
-                        label: "Import CSV",
-                        icon: "plus.circle",
-                        color: .twitterBlue) {
-                            importCSVFile()
-                        }
-                    
-                    SidebarGridItem(
-                        label: "Export Analysis",
-                        icon: "square.and.arrow.up.circle",
-                        color: .green) {
-                            // export logic
-                        }
-                }
-                
-                GridRow {
-                    SidebarGridItem(
-                        label: "Favorites",
-                        icon: filteringFavorites ? "star.fill" : "star",
-                        color: .yellow) {
-                            // export logic
-                        }
-                    
-                    SidebarGridItem(
-                        label: "Recently Deleted",
-                        icon: "trash",
-                        color: .red) {
-                            // export logic
-                        }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top)
+            SidebarGridModule(
+                filteringFavorites: $filteringFavorites,
+                isAnalyzing: $isAnalyzing,
+                selection: $selection,
+                modelContext: modelContext
+            )
             
             List(selection: $selection) {
                 Section("Recents"){
