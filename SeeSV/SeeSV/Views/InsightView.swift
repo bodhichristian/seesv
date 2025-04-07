@@ -24,16 +24,6 @@ struct InsightView<T: Numeric & Comparable>: View {
         }
     }
     
-    func formatNumber(_ number: Double, isInteger: Bool) -> String {
-        if number >= 100_000 {
-            return String(format: "%.0fk", number / 1_000)
-        } else if number >= 1_000 {
-            return String(format: "%.1fk", number / 1_000)
-        } else {
-            return isInteger ? String(format: "%.0f", number) : String(format: "%.1f", number)
-        }
-    }
-    
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
             .foregroundStyle(.black.opacity(0.5))
@@ -59,6 +49,16 @@ struct InsightView<T: Numeric & Comparable>: View {
                     localValue = value
                 }
             }
+    }
+    
+    func formatNumber(_ number: Double, isInteger: Bool) -> String {
+        if number >= 100_000 {
+            return String(format: "%.0fk", number / 1_000)
+        } else if number >= 1_000 {
+            return String(format: "%.1fk", number / 1_000)
+        } else {
+            return isInteger ? String(format: "%.0f", number) : String(format: "%.1f", number)
+        }
     }
 }
 
