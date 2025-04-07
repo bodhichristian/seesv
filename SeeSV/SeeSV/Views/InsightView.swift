@@ -36,7 +36,7 @@ struct InsightView<T: Numeric & Comparable>: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            .foregroundStyle(.black.gradient.opacity(0.6))
+            .foregroundStyle(.black.opacity(0.5))
             .frame(width: 150, height: 100)
             .overlay {
                 VStack {
@@ -44,13 +44,13 @@ struct InsightView<T: Numeric & Comparable>: View {
                         .contentTransition(.numericText()) // Works now because text updates reactively
                         .font(.system(size: 40))
                         .fontWeight(.semibold)
-                        .foregroundStyle(.twitterBlue.gradient)
+                        .foregroundStyle(.twitterBlue)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                     
                     Text(label)
                         .font(.headline)
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                 }
                 .padding()
             }
