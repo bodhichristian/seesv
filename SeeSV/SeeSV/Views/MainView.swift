@@ -35,7 +35,7 @@ struct MainView: View {
                 WelcomeView()
             } else {
                 if isAnalyzing {
-                    DragDropView(selectedAnalysis: Binding(
+                    NewAnalysisContainer(selectedAnalysis: Binding(
                         get: { selection.first },
                         set: { if let newValue = $0 { selection = [newValue] } }
                     ), creatingNewAnalysis: $isAnalyzing)

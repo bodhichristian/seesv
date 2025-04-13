@@ -2,67 +2,47 @@
 //  DragDropView.swift
 //  SeeSV
 //
-//  Created by christian on 3/8/25.
+//  Created by christian on 4/13/25.
 //
 
 import SwiftUI
+import PythonKit
 
 struct DragDropView: View {
-    @Environment(\.modelContext) var modelContext
-    @Binding var selectedAnalysis: CSVAnalysis?
-    @Binding var creatingNewAnalysis: Bool
-    @State private var isTargeted: Bool = false
-    @State private var isLoading: Bool = false
+    let label: String
+    @Binding var isTargeted: Bool
+    var onDrop: (URL) -> Void // Closure to handle the dropped URL
     
     var body: some View {
-        if isLoading {
-            LoadingView()
-        } else {
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [10]))
-                    .foregroundStyle(.twitterBlue)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
-                
-                Text("Drag & Drop a CSV file here")
-                    .font(.title2)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(isTargeted ? .twitterBlue.opacity(0.2) : .gray.opacity(0.2)) // Changes on hover
-                    .animation(.easeInOut, value: isTargeted)
-                    .onDrop(of: ["public.file-url"], isTargeted: $isTargeted) { providers in
-                        handleFileDrop(providers)
-                    }
-            }
-        }
-    }
-    
-    func handleFileDrop(_ providers: [NSItemProvider]) -> Bool {
-        guard let item = providers.first else { return false }
-        item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
-            DispatchQueue.main.async {
-                if let urlData = urlData as? Data,
-                   let url = URL(dataRepresentation: urlData, relativeTo: nil) {
-                    
-                    isLoading = true// Show loading state
-                    
-                    Task {
-                        let analysis = CSVService.readCSV(filePath: url.path)
-                        modelContext.insert(analysis)
-                        try modelContext.save()
-                        selectedAnalysis = analysis
-                        withAnimation {
-                            creatingNewAnalysis = false
-                            isLoading = false
+        VStack {
+            Text(label)
+                .foregroundStyle(.white)
+                .font(.headline)
+            
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [10]))
+                .foregroundStyle(.twitterBlue)
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(isTargeted ? .twitterBlue.opacity(0.2) : .gray.opacity(0.2))
+                .animation(.easeInOut, value: isTargeted)
+                .onDrop(of: ["public.file-url"], isTargeted: $isTargeted) { providers in
+                    guard let item = providers.first else { return false }
+                    item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
+                        DispatchQueue.main.async {
+                            if let urlData = urlData as? Data,
+                               let url = URL(dataRepresentation: urlData, relativeTo: nil) {
+                                onDrop(url) // Pass the URL to the parent
+                            }
                         }
                     }
+                    return true
                 }
-            }
+                .frame(width: 300, height: 300)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
         }
-        return true
     }
 }
-
 #Preview {
-    DragDropView(selectedAnalysis: .constant(CSVAnalysis()), creatingNewAnalysis: .constant(false))
+    DragDropView(label: "Overview CSV", isTargeted: .constant(false))
 }

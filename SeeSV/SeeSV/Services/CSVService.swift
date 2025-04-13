@@ -11,6 +11,7 @@ import PythonKit
 class CSVService {
     static let sys = Python.import("sys").path.append("/Library/Frameworks/Python.framework/Versions/Current/lib/python3.9/site-packages")
     static let pd = Python.import("pandas")
+
     
     static func readCSV(filePath: String) -> CSVAnalysis {
         let df = pd.read_csv(filePath)
